@@ -1,180 +1,227 @@
 # SimDoc MCP Server
 
-MCP (Model Context Protocol) server providing access to scientific simulation documentation through Claude Desktop and Cursor.
+AI-powered code search for scientific simulation documentation. Search PyBaMM, Cantera, and other simulators directly from your AI coding assistant.
 
-## For End Users
+## 🚀 Quick Start
 
-**Just want to use SimDoc?** You don't need to run this server yourself!
+### Using the Public Hosted Service (Recommended)
 
-### Quick Setup (2 minutes)
+SimDoc provides a **free public MCP server** - no installation required.
 
-**Step 1:** Locate your config file
-- **Claude Desktop (macOS)**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Claude Desktop (Windows)**: `%APPDATA%\Claude\claude_desktop_config.json`
-- **Cursor**: `~/.cursor/mcp.json`
+**Endpoint:** `https://simdoc.subspace-lab.com/sse`
 
-**Step 2:** Add SimDoc to your config
+**Step 1: Add SimDoc to your AI assistant**
 
+Choose your tool:
+
+<details>
+<summary><b>Claude Desktop</b></summary>
+
+**Config file location:**
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+**Add this configuration:**
 ```json
 {
   "mcpServers": {
     "simdoc": {
-      "url": "http://simdoc.subspace-lab.com:8080/sse"
+      "url": "https://simdoc.subspace-lab.com/sse"
     }
   }
 }
 ```
+</details>
 
-**Step 3:** Restart Claude Desktop or Cursor
+<details>
+<summary><b>Claude Code</b></summary>
 
-**Step 4:** Try it out!
+**Config file location:**
+- Project: `.mcp.json` (in project root)
+- User: `~/.claude/settings.local.json`
 
-Ask Claude:
-- "How do I simulate battery aging in PyBaMM?"
-- "Show me Cantera reactor network examples"
+**Add this configuration:**
+```json
+{
+  "mcpServers": {
+    "simdoc": {
+      "type": "sse",
+      "url": "https://simdoc.subspace-lab.com/sse"
+    }
+  }
+}
+```
+</details>
+
+<details>
+<summary><b>Cursor</b></summary>
+
+**Config file location:** `~/.cursor/mcp.json`
+
+**Add this configuration:**
+```json
+{
+  "mcpServers": {
+    "simdoc": {
+      "url": "https://simdoc.subspace-lab.com/sse"
+    }
+  }
+}
+```
+</details>
+
+<details>
+<summary><b>Cline (VS Code)</b></summary>
+
+**Setup:** Click "Configure MCP Servers" in Cline extension panel
+
+**Add this configuration:**
+```json
+{
+  "mcpServers": {
+    "simdoc": {
+      "url": "https://simdoc.subspace-lab.com/sse",
+      "alwaysAllow": []
+    }
+  }
+}
+```
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+**Config file location:** Windsurf MCP settings
+
+**Add this configuration:**
+```json
+{
+  "mcpServers": {
+    "simdoc": {
+      "url": "https://simdoc.subspace-lab.com/sse"
+    }
+  }
+}
+```
+</details>
+
+**Step 2: Restart your AI assistant**
+
+Completely quit and reopen your AI tool.
+
+**Step 3: Try it!**
+
+Ask your AI assistant:
+- *"How do I simulate battery aging in PyBaMM?"*
+- *"Show me Cantera reactor network examples"*
+- *"How can I model battery degradation over drive cycles?"*
 
 ---
 
-## Features
+## 🎯 What You Get
 
-- 🔍 Search scientific simulation documentation (PyBaMM, Cantera, and more)
-- 🤖 AI-powered code snippet retrieval with relevance scoring
-- 📚 Structured simulator metadata and version resolution
-- 🔌 Works with Claude Desktop and Cursor
-- 🚀 Hosted and maintained - no setup required
+### Available Simulators
 
-## Available MCP Tools
+| Simulator | Documentation | Examples |
+|-----------|---------------|----------|
+| **PyBaMM** | Battery modeling | 120+ files |
+| **Cantera** | Chemical kinetics & thermodynamics | 98+ files |
 
-### `resolve-simulator-id`
-Find simulators by name with metadata, versions, and trust scores.
+### MCP Tools
 
-**Example usage in Claude:**
-> "What simulators are available for battery modeling?"
+- **`resolve-simulator-id`** - Find simulators by name with metadata
+- **`get-simulator-docs`** - Search code snippets and documentation
 
-### `get-simulator-docs`
-Search and retrieve code snippets from simulator documentation.
+### Example Queries
 
-**Example usage in Claude:**
-> "Show me PyBaMM examples for SEI layer growth"
-> "How do I create a premixed flame in Cantera?"
+1. **Battery Simulations**
+   - "How do I simulate SEI layer growth in PyBaMM?"
+   - "Show me battery calendar aging examples"
+   - "How to simulate realistic driving conditions?"
+
+2. **Reactor Networks**
+   - "Set up a continuously stirred reactor in Cantera"
+   - "Calculate ignition delay times"
+
+3. **Thermodynamics**
+   - "How to calculate specific heat of gas mixtures?"
+   - "Get entropy and enthalpy properties"
 
 ---
 
-## For Developers
+## 🏗️ How It Works
 
-This repository contains the open-source MCP server implementation. It's provided for transparency and as a reference for MCP protocol implementation.
-
-### Running Your Own Instance (Optional)
-
-If you want to run your own MCP server instance:
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/jiweiqi/simdoc-mcp.git
-cd simdoc-mcp
-
-# 2. Configure backend URL
-cp .env.example .env
-# Edit .env and set BACKEND_URL
-
-# 3. Run with Docker Compose
-docker-compose up -d
+```
+┌──────────────────┐
+│ Your AI Client   │
+│ (Claude/Cursor)  │
+└────────┬─────────┘
+         │
+         │ HTTPS MCP Protocol
+         │
+┌────────▼─────────┐
+│ SimDoc Service   │  https://simdoc.subspace-lab.com/sse
+│ (Hosted)         │
+└──────────────────┘
 ```
 
-**Note:** You'll need access to a SimDoc backend API. The hosted version uses our internal backend.
-
-### Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `BACKEND_URL` | Required | SimDoc backend API endpoint |
-| `HOST` | `0.0.0.0` | Server host to bind to |
-| `PORT` | `8080` | Server port |
-| `LOG_LEVEL` | `INFO` | Logging level |
-| `TRANSPORT` | `sse` | MCP transport protocol |
+SimDoc provides MCP tools to search scientific simulation documentation. Just add the endpoint to your AI client and start asking questions.
 
 ---
 
-## Architecture
+## 🐛 Troubleshooting
 
-```
-┌──────────────┐
-│ Claude/Cursor│  MCP Protocol over SSE
-└──────┬───────┘
-       │
-┌──────▼───────┐
-│ MCP Server   │  Port 8080 (FastMCP)
-│ simdoc-mcp   │  This repository
-└──────┬───────┘
-       │ HTTP REST API
-┌──────▼───────┐
-│ Backend API  │  SimDoc backend
-│              │  (Separate deployment)
-└──────────────┘
-```
+### MCP tools not appearing in your AI client
 
-This repository contains only the MCP protocol layer. The backend (search, indexing, AI summarization) is maintained separately.
+1. **Verify config file location and syntax**
+   ```bash
+   # Claude Desktop (macOS)
+   cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
 
----
+   # Validate JSON syntax
+   python3 -m json.tool < config.json
+   ```
 
-## Supported Simulators
+2. **Check the URL is correct**
+   - Should be: `https://simdoc.subspace-lab.com/sse`
+   - Common mistake: Using `http://` instead of `https://`
 
-Currently available:
-- **PyBaMM** - Python Battery Mathematical Modeling
-- **Cantera** - Chemical kinetics, thermodynamics, and transport
-- More coming soon!
+3. **Restart your AI client completely**
+   ```bash
+   # Claude Desktop (macOS)
+   killall Claude && open -a Claude
+   ```
 
----
+4. **Test the endpoint directly**
+   ```bash
+   curl https://simdoc.subspace-lab.com/sse
+   # Expected: "event: endpoint" response
+   ```
 
-## Troubleshooting
-
-### Tools not appearing in Claude/Cursor
-
-1. Verify config file location and syntax
-2. Make sure you restarted Claude Desktop completely (quit and reopen)
-3. Check the URL is correct: `http://simdoc.subspace-lab.com:8080/sse`
-
-### Getting errors when using tools
-
-The hosted server should be running 24/7. If you encounter issues, please open a GitHub issue.
+5. **Check your AI client's MCP logs**
+   - Claude Desktop (macOS): `~/Library/Logs/Claude/mcp*.log`
+   - Look for connection errors or timeout messages
 
 ---
 
-## Contributing
+## 📖 More Information
 
-This repository is maintained by the SimDoc team. We develop internally and sync to this public repo for transparency.
-
-**Want to help?**
-- Report issues if tools don't work
-- Suggest new simulators to add
-- Share feedback on search quality
-
-We don't accept code contributions at this time, but appreciate bug reports and feature requests!
+- **Example Queries**: [MCP Showcase](../md-files/MCP_SHOWCASE.md) - Real usage examples
+- **Main Repository**: [SimDoc README](../README.md) - Full project overview
+- **Report Issues**: [GitHub Issues](https://github.com/your-org/simdoc/issues)
 
 ---
 
-## Development
+## 🤝 Contributing
 
-Development happens in our private repository and is synced here. This ensures:
-- Quality control of the MCP implementation
-- Coordination with backend development
-- Consistent user experience
+Contributions welcome! See the main repository for guidelines.
 
 ---
 
-## License
+## 📝 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Built with [FastMCP](https://github.com/jlowin/fastmcp)
-- Supports [Model Context Protocol](https://modelcontextprotocol.io/)
-- Designed for scientific computing communities
+MIT License - see LICENSE file for details.
 
 ---
 
-## Support
-
-- **Issues**: [GitHub Issues](https://github.com/jiweiqi/simdoc-mcp/issues)
-- **Questions**: Open a GitHub issue with your question
+**Built with** ❤️ **for the scientific computing community**
